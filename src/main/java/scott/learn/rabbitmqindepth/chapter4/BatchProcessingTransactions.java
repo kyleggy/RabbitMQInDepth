@@ -3,10 +3,11 @@ package scott.learn.rabbitmqindepth.chapter4;
 import com.rabbitmq.client.*;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
 public class BatchProcessingTransactions {
-    private static final String exchange = "TransactionExchangeScott";
+    private static final String exchange = "TransactionExchangeDe1Scott";
 
     public static void main(String[] args) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
@@ -16,11 +17,13 @@ public class BatchProcessingTransactions {
         Channel channel = connection.createChannel();
 
         channel.exchangeDeclare(exchange, BuiltinExchangeType.TOPIC);
-        channel.queueDeclare("transaction queue", true, false, false, null);
-        channel.queueBind("transaction queue", exchange, "transaction queue");
+        channel.queueDeclare("transaction queue1", true, false, false, null);
+        channel.queueBind("transaction queue1", exchange, "transaction queue");
         channel.txSelect();
 
-        channel.basicPublish(exchange,"transaction queue", MessageProperties.PERSISTENT_TEXT_PLAIN, "message".getBytes());
+        AMQP.BasicProperties basicProperties = new AMQP.BasicProperties().builder().deliveryMode(2).contentType("text/plain").timestamp(new Date()).type("important").build();
+
+        channel.basicPublish(exchange,"transaction queue", basicProperties, "message".getBytes());
 
         channel.txCommit();
 
