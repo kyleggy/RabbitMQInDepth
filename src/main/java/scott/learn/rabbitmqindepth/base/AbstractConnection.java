@@ -11,8 +11,8 @@ public abstract class AbstractConnection {
     protected static Connection connection;
     protected static Channel channel;
     protected final static String HOST = "localhost";
-    protected final static int PORT = 5682;
-
+    //protected final static int PORT = 5682;
+    protected final static int PORT = 5672;
     protected static void initialize()throws IOException, TimeoutException{
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
