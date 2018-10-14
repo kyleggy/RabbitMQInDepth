@@ -37,7 +37,11 @@ public class RPCPublish extends AbstractConnection {
 
 
         for (int i = 0; i < images.size(); i ++) {
-            AMQP.BasicProperties basicProperties = new AMQP.BasicProperties().builder().contentType("text/plain").correlationId(images.get(i)).replyTo(reponseQueueName)
+            AMQP.BasicProperties basicProperties = new AMQP.BasicProperties().builder().contentType("text/plain").correlationId(images.get(i))
+                    //replyto is not a must:The reply-to property can be used to carry the
+                    //routing key a consumer should use when replying
+                    //to a message implementing an RPC pattern.
+                    .replyTo(reponseQueueName)
                     //time stamp must be defined, otherwise it is null while reading
                     .timestamp(new Date()).build();
             channel.basicPublish(PublishDirectExchange.DIRECT_RPC_REQUESTS_EXCHANGE, DIRECT_RPC_REQUESTS_ROUTE_KEY, basicProperties, images.get(i).getBytes("UTF-8"));
