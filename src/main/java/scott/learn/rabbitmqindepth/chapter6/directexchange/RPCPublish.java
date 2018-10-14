@@ -25,12 +25,12 @@ public class RPCPublish extends AbstractConnection {
         AMQP.Queue.DeclareOk declareOk = channel.queueDeclare(reponseQueueName, false, true, true, null);
         //check queue created
         if (declareOk.getQueue().equals(reponseQueueName)) {
-            System.out.println("Response queue was created successfully");
+            System.out.println("Response queue: " + reponseQueueName + " was created successfully");
         }
 
         AMQP.Queue.BindOk bindOk = channel.queueBind(reponseQueueName, PublishDirectExchange.RPC_RESPONSE_EXCHANGE, RPC_RESPONSE_ROUTE_KEY);
         if (bindOk != null) {
-            System.out.println(reponseQueueName + " was bind to the " + PublishDirectExchange.RPC_RESPONSE_EXCHANGE);
+            System.out.println(reponseQueueName + " was bind to the exchange:" + PublishDirectExchange.RPC_RESPONSE_EXCHANGE);
         }
 
         List<String> images = mockImages();
@@ -38,13 +38,14 @@ public class RPCPublish extends AbstractConnection {
 
         for (int i = 0; i < images.size(); i ++) {
             AMQP.BasicProperties basicProperties = new AMQP.BasicProperties().builder().contentType("text/plain").correlationId(images.get(i)).replyTo(reponseQueueName)
+                    //time stamp must be defined, otherwise it is null while reading
                     .timestamp(new Date()).build();
             channel.basicPublish(PublishDirectExchange.DIRECT_RPC_REQUESTS_EXCHANGE, DIRECT_RPC_REQUESTS_ROUTE_KEY, basicProperties, images.get(i).getBytes("UTF-8"));
             boolean shouldRun = true;
             GetResponse getResponse = null;
             while (shouldRun) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

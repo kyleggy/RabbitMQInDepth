@@ -18,30 +18,30 @@ public class RPCWorker extends AbstractConnection {
         AMQP.Queue.DeclareOk declareOk = channel.queueDeclare(queueName, false, true, true, null);
         //check queue created
         if (declareOk.getQueue().equals(queueName)) {
-            System.out.println("RPC Response worker queue was created successfully");
+            System.out.println("RPC Response worker queue: " + queueName + " was created successfully");
         }
 
         AMQP.Queue.BindOk bindOk = channel.queueBind(queueName, PublishDirectExchange.DIRECT_RPC_REQUESTS_EXCHANGE, DIRECT_RPC_REQUESTS_ROUTE_KEY);
         if (bindOk != null) {
-            System.out.println(queueName + " was bind to the " + PublishDirectExchange.DIRECT_RPC_REQUESTS_EXCHANGE + " with routing key: " + DIRECT_RPC_REQUESTS_ROUTE_KEY);
+            System.out.println(queueName + " was bind to the exchange: " + PublishDirectExchange.DIRECT_RPC_REQUESTS_EXCHANGE + " with routing key: " + DIRECT_RPC_REQUESTS_ROUTE_KEY);
         }
 
         Consumer consumer = new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope,
                                        AMQP.BasicProperties properties, byte[] body) throws IOException {
-
-                    //properties.getTimestamp()
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //properties.getTimestamp()
                 long seconds = TimeUnit.MILLISECONDS.toSeconds(new Date().getTime() - properties.getTimestamp().getTime());
                 System.out.println("Received RPC request published " + seconds + " seconds ago");
 
                 String message = new String(body, "UTF-8");
                 System.out.println("Processing message: " + message);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
 
                 Map<String,Object> headers = new HashMap<String, Object>();
                 headers.put("first_publish", properties.getTimestamp());
