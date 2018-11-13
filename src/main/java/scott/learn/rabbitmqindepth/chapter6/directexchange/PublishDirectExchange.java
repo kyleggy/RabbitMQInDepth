@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
 public class PublishDirectExchange extends AbstractConnection {
     public static final String DIRECT_RPC_REQUESTS_EXCHANGE = "scott-direct-rpc-requests";
     public static final String DIRECT_RPC_REQUESTS_ROUTE_KEY = "detect-faces";
-    public static final String RPC_RESPONSE_EXCHANGE = "scott-rpc-replies";
+    public static final String RPC_RESPONSE_EXCHANGE = "scott-direct-rpc-replies";
     public static final String RPC_RESPONSE_ROUTE_KEY = "rpc-replies-route-key";
     public static final String IMAGE_ONE = "image_one";
     public static final String IMAGE_TWO = "image_two";
